@@ -1,4 +1,5 @@
 numDimensions = 0;
+numFactTableColumns = 0;
 
 const addDimensionTable = () => {
     numDimensions += 1;
@@ -63,9 +64,9 @@ const addDimensionField = (elRef) => {
     numFields += 1;
 
     fieldDivId = parentDivId + 'f' + numFields;
-    isPKId = fieldDivId + 'isPK';
-    nameId = fieldDivId + 'name';
-    typeId = fieldDivId + 'type';
+    isPKId = fieldDivId + '_isPK';
+    nameId = fieldDivId + '_name';
+    typeId = fieldDivId + '_type';
 
 
     fieldDiv = document.createElement("div");
@@ -115,5 +116,68 @@ const addDimensionField = (elRef) => {
     fieldDiv.appendChild(typeEl);
 
     fieldsDiv.appendChild(fieldDiv);
+
+}
+
+const addFTColumn = () => {
+    parentDivId = "ft_columns";
+    parentDiv = document.getElementById(parentDivId);
+
+    numFactTableColumns += 1;
+    columnDivId = parentDivId + numFactTableColumns;
+    
+    
+    fkId = columnDivId + '_fk';
+    nameId = columnDivId + '_name';
+    typeId = columnDivId + '_type';
+
+
+    ftColumnDiv = document.createElement("div");
+    ftColumnDiv.setAttribute('id', columnDivId);
+
+
+    // PK
+    fkLabel = document.createElement("label");
+    fkLabel.setAttribute('for', fkId);
+    fkLabel.textContent = "Foreign key";
+
+    fkEl = document.createElement("input");
+    fkEl.setAttribute('id', fkId);
+    fkEl.setAttribute('name', fkId);
+    fkEl.setAttribute('type', 'text'); // TO DO Dropdown from list of dimensions
+
+
+    // Name
+    nameLabel = document.createElement("label");
+    nameLabel.setAttribute('for', nameId);
+    nameLabel.textContent = "Name";
+
+    nameEl = document.createElement("input");
+    nameEl.setAttribute('id', nameId);
+    nameEl.setAttribute('name', nameId);
+    nameEl.setAttribute('type', 'text');
+
+
+    // Type
+    typeLabel = document.createElement("label");
+    typeLabel.setAttribute('for', typeId);
+    typeLabel.textContent = "Type";
+
+    typeEl = document.createElement("input");
+    typeEl.setAttribute('id', typeId);
+    typeEl.setAttribute('name', typeId);
+    typeEl.setAttribute('type', 'text');
+
+
+    ftColumnDiv.appendChild(fkLabel);
+    ftColumnDiv.appendChild(fkEl);
+
+    ftColumnDiv.appendChild(nameLabel);
+    ftColumnDiv.appendChild(nameEl);
+
+    ftColumnDiv.appendChild(typeLabel);
+    ftColumnDiv.appendChild(typeEl);
+
+    parentDiv.appendChild(ftColumnDiv);
 
 }
