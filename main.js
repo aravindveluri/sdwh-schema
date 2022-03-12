@@ -127,70 +127,74 @@ const addDimensionField = (elRef) => {
 
 }
 
-// const addFTColumn = () => {
-//     parentDivId = "ft_columns";
-//     parentDiv = document.getElementById(parentDivId);
-
-//     numFactTableColumns += 1;
-//     columnDivId = parentDivId + numFactTableColumns;
-    
-    
-//     fkId = columnDivId + '_fk';
-//     nameId = columnDivId + '_name';
-//     typeId = columnDivId + '_type';
-
-
-//     ftColumnDiv = document.createElement("div");
-//     ftColumnDiv.setAttribute('id', columnDivId);
-
-
-//     // PK
-//     fkLabel = document.createElement("label");
-//     fkLabel.setAttribute('for', fkId);
-//     fkLabel.textContent = "Foreign key";
-
-//     fkEl = document.createElement("input");
-//     fkEl.setAttribute('id', fkId);
-//     fkEl.setAttribute('name', fkId);
-//     fkEl.setAttribute('type', 'text'); // TO DO Dropdown from list of dimensions
-
-
-//     // Name
-//     nameLabel = document.createElement("label");
-//     nameLabel.setAttribute('for', nameId);
-//     nameLabel.textContent = "Name";
-
-//     nameEl = document.createElement("input");
-//     nameEl.setAttribute('id', nameId);
-//     nameEl.setAttribute('name', nameId);
-//     nameEl.setAttribute('type', 'text');
-
-
-//     // Type
-//     typeLabel = document.createElement("label");
-//     typeLabel.setAttribute('for', typeId);
-//     typeLabel.textContent = "Type";
-
-//     typeEl = document.createElement("input");
-//     typeEl.setAttribute('id', typeId);
-//     typeEl.setAttribute('name', typeId);
-//     typeEl.setAttribute('type', 'text');
-
-
-//     ftColumnDiv.appendChild(fkLabel);
-//     ftColumnDiv.appendChild(fkEl);
-
-//     ftColumnDiv.appendChild(nameLabel);
-//     ftColumnDiv.appendChild(nameEl);
-
-//     ftColumnDiv.appendChild(typeLabel);
-//     ftColumnDiv.appendChild(typeEl);
-
-//     parentDiv.appendChild(ftColumnDiv);
-
-// }
-
 const addFTColumn = () => {
+    parentDivId = "ft_columns";
+    parentDiv = document.getElementById(parentDivId);
+
+    numFactTableColumns += 1;
+    columnDivId = parentDivId + numFactTableColumns;
+    
+    
+    fkId = columnDivId + '_fk';
+    nameId = columnDivId + '_name';
+    typeId = columnDivId + '_type';
+
+
+    ftColumnDiv = document.createElement("div");
+    ftColumnDiv.setAttribute('id', columnDivId);
+    ftColumnDiv.setAttribute('class', 'column');
+
+
+    // PK
+    fkLabel = document.createElement("label");
+    fkLabel.setAttribute('for', fkId);
+    fkLabel.textContent = "Foreign key";
+
+    fkEl = document.createElement("input");
+    fkEl.setAttribute('id', fkId);
+    fkEl.setAttribute('name', fkId);
+    fkEl.setAttribute('type', 'text'); // TO DO Dropdown from list of dimensions
+    fkEl.setAttribute('class', 'fk');
+
+
+    // Name
+    nameLabel = document.createElement("label");
+    nameLabel.setAttribute('for', nameId);
+    nameLabel.textContent = "Name";
+
+    nameEl = document.createElement("input");
+    nameEl.setAttribute('id', nameId);
+    nameEl.setAttribute('name', nameId);
+    nameEl.setAttribute('type', 'text');
+    nameEl.setAttribute('class', 'name');
+
+
+    // Type
+    typeLabel = document.createElement("label");
+    typeLabel.setAttribute('for', typeId);
+    typeLabel.textContent = "Type";
+
+    typeEl = document.createElement("input");
+    typeEl.setAttribute('id', typeId);
+    typeEl.setAttribute('name', typeId);
+    typeEl.setAttribute('type', 'text');
+    typeEl.setAttribute('class', 'type');
+
+
+    ftColumnDiv.appendChild(fkLabel);
+    ftColumnDiv.appendChild(fkEl);
+
+    ftColumnDiv.appendChild(nameLabel);
+    ftColumnDiv.appendChild(nameEl);
+
+    ftColumnDiv.appendChild(typeLabel);
+    ftColumnDiv.appendChild(typeEl);
+
+    parentDiv.appendChild(ftColumnDiv);
+
+}
+
+const toXML = () => {
     let xmldata = ['<?xml version="1.0"?>'];
     xmldata.push("<sdwh-schema>");
     
@@ -201,8 +205,9 @@ const addFTColumn = () => {
     // let aggregates = document.getElementById("aggregates");
     // let window_config = document.getElementById("window_config");
 
+    
+    // Dimensions
     xmldata.push("<dimensions>");
-
     $('#dimensions .dimension').each((i1, el1) => {
         let dimension = $(el1);
         
@@ -227,23 +232,64 @@ const addFTColumn = () => {
     })
     xmldata.push("</dimensions>");
 
+
+    // Fact table columns
+    xmldata.push("<columns>");
+    $('#ft_columns .column').each((i1, el1) => {
+        let column = $(el1);
+        
+        let fk = $(column.children(".fk")[0]).val();
+        let name = $(column.children(".name")[0]).val();
+        let type = $(column.children(".type")[0]).val();
+
+        xmldata.push('<column fk="' + fk + '">');
+        xmldata.push('<name>' + name + '</name>');
+        xmldata.push('<type>' + type + '</type>');
+        xmldata.push('</column>');
+
+    })
+    xmldata.push("</columns>");
+
+
+    // Emitter
+    let emitterLocation = $("#emitter_loc input").val();
+    xmldata.push("<fact-table>")
+    xmldata.push('<loc>"' + emitterLocation + '"</loc>')
+    xmldata.push("</fact-table>")
+
     
+    // Aggregates
+    xmldata.push("<aggregates>")
+    $('#aggregates input').each((i, e) => {
+        if($(e).is(":checked")) xmldata.push('<agg>' + e.id +'</agg>')
+    })
+    xmldata.push("</aggregates>")
 
-    // for(let i=0;i<inputs.length;i++){
-    //     let el=document.createElement("ELEMENT");
-    // if (inputs[i].name){
-    //     el.setAttribute("name",inputs[i].name);
-    //     el.setAttribute("value",inputs[i].value);
-    //     xmldata.push(el.outerHTML);
-    // }
+    
+    // Window Config
+    xmldata.push("<window-config>")
+    xmldata.push('<window-size>' + $("#wsize").val() + '</window-size>')
+    xmldata.push('<window-velocity>' + $("#wvelocity").val() + '</window-velocity>')
+    xmldata.push('<window-units>' + $("#wunits").val() + '</window-units>')
+    xmldata.push("</window-config>")
 
-    // }
-    // xmldata.push("</form>");
-    // return xmldata.join("\n");
 
+    xmldata.push("</sdwh-schema>");
 
     let xmldoc = xmldata.join("\n")
-    
-    console.log(xmldoc)
-
+    downloadString(xmldoc, "xml", "config");
 }
+
+function downloadString(text, fileType, fileName) {
+    let blob = new Blob([text], { type: fileType });
+  
+    let a = document.createElement('a');
+    a.download = fileName;
+    a.href = URL.createObjectURL(blob);
+    a.dataset.downloadurl = [fileType, a.download, a.href].join(':');
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function() { URL.revokeObjectURL(a.href); }, 1500);
+  }
