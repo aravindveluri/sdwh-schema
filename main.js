@@ -277,7 +277,7 @@ const toXML = () => {
     xmldata.push("</sdwh-schema>");
 
     let xmldoc = xmldata.join("\n")
-    downloadString(xmldoc, "xml", "config");
+    downloadString(xmldoc, "text/xml", "config");
 }
 
 function downloadString(text, fileType, fileName) {
