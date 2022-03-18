@@ -70,6 +70,7 @@ const addDimensionField = (elRef) => {
     isPKId = fieldDivId + '_isPK';
     nameId = fieldDivId + '_name';
     typeId = fieldDivId + '_type';
+    isEntryPointId = fieldDivId + '_isEntryPoint';
 
 
     fieldDiv = document.createElement("div");
@@ -113,6 +114,17 @@ const addDimensionField = (elRef) => {
     typeEl.setAttribute('type', 'text');
     typeEl.setAttribute('class', 'type');
 
+    // Entry Point
+    isEntryPointLabel = document.createElement("label");
+    isEntryPointLabel.setAttribute('for', isEntryPointId);
+    isEntryPointLabel.textContent = "Is this an Entry Point for analysis?";
+
+    isEntryPointEl = document.createElement("input");
+    isEntryPointEl.setAttribute('id', isEntryPointId);
+    isEntryPointEl.setAttribute('name', isEntryPointId);
+    isEntryPointEl.setAttribute('type', 'checkbox');
+    isEntryPointEl.setAttribute('class', 'entryPoint');
+
 
     fieldDiv.appendChild(isPKEl);
     fieldDiv.appendChild(isPKLabel);
@@ -122,6 +134,9 @@ const addDimensionField = (elRef) => {
 
     fieldDiv.appendChild(typeLabel);
     fieldDiv.appendChild(typeEl);
+
+    fieldDiv.appendChild(isEntryPointEl);
+    fieldDiv.appendChild(isEntryPointLabel);
 
     fieldsDiv.appendChild(fieldDiv);
 
@@ -213,7 +228,7 @@ const toXML = () => {
         
         let dimensionName = $(dimension.children(".dimensionName")[0]).val();
         let dataLocation = $(dimension.children(".dataLocation")[0]).val();
-        xmldata.push('<d name="' + dimensionName + '">');
+        xmldata.push('<dim name="' + dimensionName + '">');
 
         $(dimension.find(".dimensionField")).each((i3, e3) => {
             let dimensionField = $(e3);
@@ -221,14 +236,15 @@ const toXML = () => {
             let isPk = $(dimensionField.children(".pk")[0]).is(":checked");
             let name = $(dimensionField.children(".name")[0]).val();
             let type = $(dimensionField.children(".type")[0]).val();
+            let isEntryPoint = $(dimensionField.children(".entryPoint")[0]).is(":checked");
 
-            xmldata.push('<field is-pk="' + isPk + '">');
+            xmldata.push('<field is-pk="' + isPk + '" is-EntryPoint="' + isEntryPoint + '">');
             xmldata.push('<name>' + name + '</name>');
             xmldata.push('<type>' + type + '</type>');
             xmldata.push('</field>');
         });
         xmldata.push('<data-loc>' + dataLocation + '</data-loc>');
-        xmldata.push('</d>');
+        xmldata.push('</dim>');
     })
     xmldata.push("</dimensions>");
 
@@ -277,7 +293,7 @@ const toXML = () => {
     xmldata.push("</sdwh-schema>");
 
     let xmldoc = xmldata.join("\n")
-    downloadString(xmldoc, "xml", "config");
+    downloadString(xmldoc, "text/xml", "config");
 }
 
 function downloadString(text, fileType, fileName) {
