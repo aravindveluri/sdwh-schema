@@ -7,13 +7,13 @@ const addDimensionTable = () => {
     divId = 'd' + numDimensions;
     dimensionNameId = 'dname' + numDimensions;
     dataLocationNameId = 'dlname' + numDimensions;
-    
+
     parent = document.getElementById("dimensions");
 
     dimensionDiv = document.createElement("div");
     dimensionDiv.setAttribute('id', divId);
     dimensionDiv.setAttribute('class', 'dimension');
-    
+
     dimensionLabel = document.createElement("label");
     dimensionLabel.setAttribute('for', dimensionNameId);
     dimensionLabel.textContent = "Dimension Name";
@@ -43,7 +43,7 @@ const addDimensionTable = () => {
     fieldsDiv = document.createElement("div");
     fieldsDiv.setAttribute('id', divId + 'f');
 
-    
+
     parent.appendChild(dimensionDiv)
 
     dimensionDiv.appendChild(dimensionLabel);
@@ -51,8 +51,8 @@ const addDimensionTable = () => {
 
     dimensionDiv.appendChild(dataLocationLabel);
     dimensionDiv.appendChild(dataLocationEl);
-    
-    
+
+
     dimensionDiv.appendChild(addFieldButton);
     dimensionDiv.appendChild(fieldsDiv);
 
@@ -148,8 +148,8 @@ const addFTColumn = () => {
 
     numFactTableColumns += 1;
     columnDivId = parentDivId + numFactTableColumns;
-    
-    
+
+
     fkId = columnDivId + '_fk';
     nameId = columnDivId + '_name';
     typeId = columnDivId + '_type';
@@ -212,7 +212,7 @@ const addFTColumn = () => {
 const toXML = () => {
     let xmldata = ['<?xml version="1.0"?>'];
     xmldata.push("<sdwh-schema>");
-    
+
     let form = document.getElementById("schema_form");
     // let dimensions = document.getElementById("dimensions");
     // let ft_columns = document.getElementById("ft_columns");
@@ -220,12 +220,12 @@ const toXML = () => {
     // let aggregates = document.getElementById("aggregates");
     // let window_config = document.getElementById("window_config");
 
-    
+
     // Dimensions
     xmldata.push("<dimensions>");
     $('#dimensions .dimension').each((i1, el1) => {
         let dimension = $(el1);
-        
+
         let dimensionName = $(dimension.children(".dimensionName")[0]).val();
         let dataLocation = $(dimension.children(".dataLocation")[0]).val();
         xmldata.push('<dim name="' + dimensionName + '">');
@@ -250,21 +250,24 @@ const toXML = () => {
 
 
     // Fact table columns
-    xmldata.push("<columns>");
+    xmldata.push("<variables>");
     $('#ft_columns .column').each((i1, el1) => {
         let column = $(el1);
-        
+
         let fk = $(column.children(".fk")[0]).val();
         let name = $(column.children(".name")[0]).val();
         let type = $(column.children(".type")[0]).val();
-
-        xmldata.push('<column fk="' + fk + '">');
+        let pk = "true";
+        if (fk === "") {
+            pk = "false";
+        }
+        xmldata.push('<column fk="' + fk + '" pk="' + pk + '">');
         xmldata.push('<name>' + name + '</name>');
         xmldata.push('<type>' + type + '</type>');
         xmldata.push('</column>');
 
     })
-    xmldata.push("</columns>");
+    xmldata.push("</variables>");
 
 
     // Emitter
@@ -273,15 +276,15 @@ const toXML = () => {
     xmldata.push('<loc>"' + emitterLocation + '"</loc>')
     xmldata.push("</fact-table>")
 
-    
+
     // Aggregates
     xmldata.push("<aggregates>")
     $('#aggregates input').each((i, e) => {
-        if($(e).is(":checked")) xmldata.push('<agg>' + e.id +'</agg>')
+        if ($(e).is(":checked")) xmldata.push('<agg>' + e.id + '</agg>')
     })
     xmldata.push("</aggregates>")
 
-    
+
     // Window Config
     xmldata.push("<window-config>")
     xmldata.push('<window-size>' + $("#wsize").val() + '</window-size>')
@@ -298,7 +301,7 @@ const toXML = () => {
 
 function downloadString(text, fileType, fileName) {
     let blob = new Blob([text], { type: fileType });
-  
+
     let a = document.createElement('a');
     a.download = fileName;
     a.href = URL.createObjectURL(blob);
@@ -307,5 +310,5 @@ function downloadString(text, fileType, fileName) {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    setTimeout(function() { URL.revokeObjectURL(a.href); }, 1500);
-  }
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1500);
+}
