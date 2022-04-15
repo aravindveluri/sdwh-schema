@@ -309,3 +309,69 @@ function downloadString(text, fileType, fileName) {
     document.body.removeChild(a);
     setTimeout(function () { URL.revokeObjectURL(a.href); }, 1500);
 }
+
+function redirect(htmlPage) {
+    window.location.href = htmlPage;
+}
+
+function startEngine() {
+    //TO DO : call the start stream api
+    redirect("queryDisplay.html");
+}
+
+function checkboxes() {
+    console.log("Checkboxes api was called");
+    var tickNumber;
+    fetch('http://localhost:9001/getTick') //TO FILL API URL HERE
+        // Converting received data to JSON
+        .then(response => response.json())
+        .then(json => {
+            tickNumber = json.tickNum;
+        });
+    tickNumber = 10;
+    fetch('http://localhost:9001/ep') //TO FILL API URL HERE
+        .then(response => response.json())
+        .then(json => {
+            console.log(json);
+            let li = ``;
+            // Loop through each data and add a checkbox
+            json.forEach(dim => {
+                li += `<input type="checkbox" class="entryPoint" id=${dim} name=${dim}><label for=${dim}>${dim}</label>`;
+            });
+            li += `<br><input type="number" id="tick" name="tick" min="0" max=${tickNumber}><label for=tick>Select Tick Number</label>`
+            // TO DO add input selector for window tick number 
+            li += `<br><input type="button" value="Submit Query" onclick="queryApi()">`
+            // Display result
+            document.getElementById("entryPoints").innerHTML = li;
+        });
+}
+
+function queryApi() {
+    console.log("I was called");
+    var content = [];
+    var inputElements = document.getElementsByClassName('entryPoint');
+    for (var i = 0; inputElements[i]; ++i) {
+        if (inputElements[i].checked) {
+            content.push(inputElements[i].id);
+        }
+    }
+    var chooseTick = document.getElementById('tick');
+    const body = { dimensions: content, tickNumber: chooseTick.value }
+    fetch("http://localhost:9001/query", {
+        method: "POST",
+        // Adding body or contents to send
+        body: JSON.stringify(body),
+        // Adding headers to the request
+        headers: {
+            "Content-type": "application/json; charset=UTF-8"
+        }
+    })
+        // Converting to JSON
+        .then(response => response.json())
+
+        // Displaying results to console
+        .then(json => {
+            console.log(json); //this is the result sent by the api. need to figure out how to display this in frontend
+        });
+    // console.log(body);
+}
